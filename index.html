@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ダミーECサイト</title>
+  <title>ABCDEC Site</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -109,6 +109,28 @@
     .hidden {
       display: none;
     }
+    .pagination {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .pagination button {
+      margin: 0 5px;
+      padding: 10px 15px;
+      border: 1px solid #ddd;
+      background-color: #fff;
+      cursor: pointer;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+    .pagination button.active {
+      background-color: #007BFF;
+      color: #fff;
+      border: none;
+    }
+    .pagination button:hover {
+      background-color: #0056b3;
+      color: #fff;
+    }
   </style>
 </head>
 <body>
@@ -123,6 +145,7 @@
 
   <div class="container hidden">
     <div id="product-list"></div>
+    <div id="pagination" class="pagination"></div>
   </div>
 
   <script>
@@ -148,6 +171,8 @@
     // 商品リストとページネーションの処理
     const GAS_URL = "https://script.google.com/macros/s/AKfycbyTWw7s5IN7JvLCpsyq6dnS4LnLGzQ-VQRH-xVaruSijdqJFqwuxTmVcsEM0B3QQANlPA/exec";
     let products = [];
+    const itemsPerPage = 5; // 1ページに表示する商品数
+    let currentPage = 1; // 現在のページ
 
     // カートに商品を追加
     function addToCart(product) {
@@ -158,11 +183,15 @@
     }
 
     // 商品リストの描画
-    function renderProducts() {
+    function renderProducts(page) {
+      const startIndex = (page - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      const pageProducts = products.slice(startIndex, endIndex);
+
       const productList = document.getElementById("product-list");
       productList.innerHTML = ""; // 初期化
 
-      products.forEach(product => {
+      pageProducts.forEach(product => {
         const productDiv = document.createElement("div");
         productDiv.className = "product";
         productDiv.innerHTML = `
@@ -182,12 +211,36 @@
       });
     }
 
+    // ページネーションを描画する関数
+    function renderPagination() {
+      const pagination = document.getElementById("pagination");
+      pagination.innerHTML = "";
+
+      const totalPages = Math.ceil(products.length / itemsPerPage);
+      if (totalPages <= 1) return;
+
+      for (let i = 1; i <= totalPages; i++) {
+        const button = document.createElement("button");
+        button.textContent = i;
+        button.className = i === currentPage ? "active" : "";
+        button.addEventListener("click", () => {
+          if (currentPage !== i) {
+            currentPage = i;
+            renderProducts(currentPage);
+            renderPagination();
+          }
+        });
+        pagination.appendChild(button);
+      }
+    }
+
     // 商品データの取得
     fetch(GAS_URL)
       .then(response => response.json())
       .then(data => {
         products = data; // APIから取得した商品データを保存
-        renderProducts(); // 商品一覧を描画
+        renderProducts(currentPage); // 商品一覧を描画
+        renderPagination(); // ページネーションを描画
         document.getElementById("loading-indicator").classList.add("hidden");
         document.querySelector(".container").classList.remove("hidden");
       })
