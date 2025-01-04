@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ダミーECサイト</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f9f9f9;
+    }
+    header {
+      background-color: #333;
+      color: #fff;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 {
+      margin: 0;
+    }
+    .cart {
+      display: flex;
+      align-items: center;
+      font-size: 16px;
+    }
+    .cart-icon {
+      width: 24px;
+      height: 24px;
+      margin-right: 8px;
+      fill: #ffffff;
+    }
+    .container {
+      max-width: 960px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .product {
+      border-bottom: 1px solid #ddd;
+      padding: 20px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .product:last-child {
+      border-bottom: none;
+    }
+    .product img {
+      max-width: 100px;
+      margin-right: 20px;
+    }
+    .product-details {
+      flex-grow: 1;
+    }
+    .product h2 {
+      margin: 0 0 10px;
+      font-size: 18px;
+    }
+    .product p {
+      margin: 5px 0;
+    }
+    .product button {
+      padding: 10px 15px;
+      background-color: #007BFF;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .product button:hover {
+      background-color: #0056b3;
+    }
+    .loading {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 1000;
+    }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 5px solid rgba(0, 0, 0, 0.2);
+      border-top: 5px solid #007BFF;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+    .loading p {
+      margin-top: 10px;
+      font-size: 16px;
+      color: #333;
+      font-weight: bold;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- ヘッダーをインクルード -->
+  <div id="header-placeholder"></div>
+
+  <!-- ローディングインジケータ -->
+  <div id="loading-indicator" class="loading">
+    <div class="spinner"></div>
+    <p>ローディング中...</p>
+  </div>
+
+  <div class="container hidden">
+    <div id="product-list"></div>
+  </div>
+
+  <script>
+    // ヘッダーの読み込み
+    fetch("header.html")
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById("header-placeholder").innerHTML = data;
+        updateCartCount(); // ヘッダー読み込み後にカート総数を更新
+      })
+      .catch(error => console.error("ヘッダーの読み込みに失敗しました:", error));
+
+    // ローカルストレージのカート総数を取得して表示
+    function updateCartCount() {
+      const cart = JSON.parse(localStorage.getItem("cart")) || [];
+      const totalCount = cart.length; // 総商品の数
+      const cartCountElement = document.getElementById("cart-count");
+      if (cartCountElement) {
+        cartCountElement.textContent = totalCount;
+      }
+    }
+
+    // 商品リストとページネーションの処理
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbyTWw7s5IN7JvLCpsyq6dnS4LnLGzQ-VQRH-xVaruSijdqJFqwuxTmVcsEM0B3QQANlPA/exec";
+    let products = [];
+
+    // カートに商品を追加
+    function addToCart(product) {
+      const cart = JSON.parse(localStorage.getItem("cart")) || [];
+      cart.push(product);
+      localStorage.setItem("cart", JSON.stringify(cart));
+      updateCartCount(); // カートに追加後に総数を更新
+    }
+
+    // 商品リストの描画
+    function renderProducts() {
+      const productList = document.getElementById("product-list");
+      productList.innerHTML = ""; // 初期化
+
+      products.forEach(product => {
+        const productDiv = document.createElement("div");
+        productDiv.className = "product";
+        productDiv.innerHTML = `
+          <img src="${product.image}" alt="${product.name}">
+          <div class="product-details">
+            <h2>${product.name}</h2>
+            <p>${product.description}</p>
+            <p>価格: ¥${product.price.toLocaleString()}</p>
+          </div>
+          <button class="add-to-cart">カートに追加</button>
+        `;
+        productDiv.querySelector(".add-to-cart").addEventListener("click", () => {
+          addToCart(product);
+          window.location.href = "cart.html"; // カートページに遷移
+        });
+        productList.appendChild(productDiv);
+      });
+    }
+
+    // 商品データの取得
+    fetch(GAS_URL)
+      .then(response => response.json())
+      .then(data => {
+        products = data; // APIから取得した商品データを保存
+        renderProducts(); // 商品一覧を描画
+        document.getElementById("loading-indicator").classList.add("hidden");
+        document.querySelector(".container").classList.remove("hidden");
+      })
+      .catch(error => {
+        console.error("商品データの取得に失敗しました:", error);
+        document.getElementById("loading-indicator").innerHTML = "<p>データ取得に失敗しました。</p>";
+      });
+  </script>
+</body>
+</html>
