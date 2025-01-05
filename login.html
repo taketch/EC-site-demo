@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ログイン - ABCDEC Site</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f9f9f9;
+    }
+    .container {
+      max-width: 400px;
+      margin: 20px auto;
+      padding: 20px 40px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    header {
+      background-color: #333;
+      color: #fff;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 {
+      margin: 0;
+    }
+    header a {
+      color: #fff;
+      text-decoration: none;
+    }
+    .cart {
+      display: flex;
+      align-items: center;
+      font-size: 16px;
+    }
+    .cart-icon {
+      width: 24px;
+      height: 24px;
+      margin-right: 8px;
+      fill: #ffffff;
+    }
+    h2 {
+      margin-top: 0;
+      color: #333;
+    }
+    .section-divider {
+      border-top: 2px solid #ddd;
+      margin: 20px 0 30px;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    input[type="text"], input[type="tel"], input[type="email"], input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+    input[type="radio"] {
+      margin-right: 10px;
+    }
+    .product {
+      border-bottom: 1px solid #ddd;
+      padding: 20px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .product:last-child {
+      border-bottom: none;
+    }
+    .product img {
+      max-width: 100px;
+      margin-right: 20px;
+    }
+    .product-details {
+      flex-grow: 1;
+    }
+    .product h2 {
+      margin: 0 0 10px;
+      font-size: 18px;
+    }
+    .product p {
+      margin: 5px 0;
+    }
+    .total {
+      border-top: 2px solid #ddd;
+      padding-top: 10px;
+      text-align: right;
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+    }
+    .form-actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+    .form-actions button {
+      margin-bottom: 10px;
+      padding: 10px 20px;
+      background-color: #007BFF;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .form-actions button:hover {
+      background-color: #0056b3;
+    }
+    .error {
+      color: red;
+      font-size: 14px;
+    }
+    .text-link {
+      display: block;
+      margin-top: 10px;
+      font-size: 14px;
+      color: #007BFF;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- ヘッダーをインクルード -->
+  <div id="header-placeholder"></div>
+
+  <div class="container">
+    <h2>ログイン</h2>
+    <div class="form-group">
+      <label for="email">メールアドレス</label>
+      <input type="email" id="email" placeholder="メールアドレスを入力してください">
+    </div>
+    <div class="form-group">
+      <label for="password">パスワード</label>
+      <input type="password" id="password" placeholder="パスワードを入力してください">
+      <p id="login-error" class="error"></p>
+    </div>
+
+
+    <div class="form-actions">
+      <button id="login">ログイン</button>
+    </div>
+    <a href="register.html" class="text-link">アカウントを新規作成</a>
+    <a href="index.html" class="text-link">商品一覧に戻る</a>
+  </div>
+  <script>
+    // ローカルストレージのカート総数を取得して表示
+    function updateCartCount() {
+      const cart = JSON.parse(localStorage.getItem("cart")) || [];
+      const totalCount = cart.length; // 総商品の数
+      const cartCountElement = document.getElementById("cart-count");
+      if (cartCountElement) {
+        cartCountElement.textContent = totalCount;
+      }
+    }
+    
+    // ヘッダーの読み込み
+    fetch("header.html")
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById("header-placeholder").innerHTML = data;
+        updateCartCount(); // ヘッダー読み込み後にカート総数を更新
+      })
+      .catch(error => console.error("ヘッダーの読み込みに失敗しました:", error));
+
+    // ログイン処理
+    document.getElementById("login").addEventListener("click", () => {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const errorMessage = document.getElementById("login-error");
+
+      // 入力チェック
+      if (!email) {
+        errorMessage.textContent = "メールアドレスまたはパスワードが間違っています。";
+        return;
+      }
+
+      if (!password) {
+        errorMessage.textContent = "メールアドレスまたはパスワードが間違っています。。";
+        return;
+      }
+
+      // ローカルストレージからuserDataを取得
+      const userData = JSON.parse(localStorage.getItem("userData"));
+
+      // 認証チェック
+      if (userData) {
+        const userEmail = userData.email;
+        const userPassword = userData.password;
+
+        if (email === userEmail && password === userPassword) {
+          // ローカルストレージのログインフラグを1
+          const userData = JSON.parse(localStorage.getItem("userData")) || {};
+          userData.loginStatus = 1;
+          localStorage.setItem("userData", JSON.stringify(userData));
+          // 正しい場合は cart.html に遷移
+          window.location.href = "cart.html";
+        } else {
+          // 間違っている場合はエラー表示
+          errorMessage.textContent = "メールアドレスまたはパスワードが間違っています。";
+        }
+      } else {
+        // ローカルストレージにuserDataがない場合もエラー表示
+        errorMessage.textContent = "メールアドレスまたはパスワードが間違っています。";
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>マイページ - ABCDEC Site</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f9f9f9;
+    }
+
+    .container {
+      max-width: 400px;
+      margin: 20px auto;
+      padding: 20px 40px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    header {
+      background-color: #333;
+      color: #fff;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      margin: 0;
+    }
+
+    header a {
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .cart {
+      display: flex;
+      align-items: center;
+      font-size: 16px;
+    }
+
+    .cart-icon {
+      width: 24px;
+      height: 24px;
+      margin-right: 8px;
+      fill: #ffffff;
+    }
+
+    h2 {
+      margin-top: 0;
+      color: #333;
+    }
+
+    .section-divider {
+      border-top: 2px solid #ddd;
+      margin: 20px 0 30px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    input[type="text"],
+    input[type="tel"],
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+
+    input[type="radio"] {
+      margin-right: 10px;
+    }
+
+    .product {
+      border-bottom: 1px solid #ddd;
+      padding: 20px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .product:last-child {
+      border-bottom: none;
+    }
+
+    .product img {
+      max-width: 100px;
+      margin-right: 20px;
+    }
+
+    .product-details {
+      flex-grow: 1;
+    }
+
+    .product h2 {
+      margin: 0 0 10px;
+      font-size: 18px;
+    }
+
+    .product p {
+      margin: 5px 0;
+    }
+
+    .total {
+      border-top: 2px solid #ddd;
+      padding-top: 10px;
+      text-align: right;
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+
+    .form-actions button {
+      margin-bottom: 10px;
+      padding: 10px 20px;
+      background-color: #007BFF;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .form-actions button:hover {
+      background-color: #0056b3;
+    }
+
+    #delete {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background-color: #ff0000;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .error {
+      color: red;
+      font-size: 14px;
+    }
+
+    .text-link {
+      display: block;
+      margin-top: 10px;
+      font-size: 14px;
+      color: #007BFF;
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- ヘッダーをインクルード -->
+  <div id="header-placeholder"></div>
+
+  <div class="container">
+    <h2>マイページ</h2>
+    <div class="info" id="user-info">
+      <!-- ユーザー情報がここに表示されます -->
+    </div>
+    <div class="form-actions">
+      <button id="back-to-products">商品一覧に戻る</button>
+      <button id="logout">ログアウト</button>
+    </div>
+    <button id="delete">アカウント削除</button>
+  </div>
+
+  <script>
+    // ローカルストレージのカート総数を取得して表示
+    function updateCartCount() {
+      const cart = JSON.parse(localStorage.getItem("cart")) || [];
+      const totalCount = cart.length; // 総商品の数
+      const cartCountElement = document.getElementById("cart-count");
+      if (cartCountElement) {
+        cartCountElement.textContent = totalCount;
+      }
+    }
+    
+    // ヘッダーの読み込み
+    fetch("header.html")
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById("header-placeholder").innerHTML = data;
+
+        // ログイン状態に応じてリンクを変更
+        const userDataString = localStorage.getItem("userData");
+        if (userDataString) {
+          const userData = JSON.parse(userDataString); // JSONオブジェクトに変換
+          const loginLink = document.querySelector('a[href="login.html"]'); // ログインリンクを取得
+          if (userData.loginStatus === 1 && loginLink) {
+            loginLink.textContent = "マイページ"; // テキストを変更
+            loginLink.setAttribute("href", "mypage.html"); // リンク先を変更
+          }
+        }
+
+        // ヘッダー読み込み後にカート総数を更新
+        updateCartCount();
+      })
+      .catch(error => console.error("ヘッダーの読み込みに失敗しました:", error));
+
+    // ローカルストレージからユーザー情報を取得して表示
+    const userData = JSON.parse(localStorage.getItem("userData"));
+
+    if (!userData) {
+      alert("登録された情報がありません。ログインまたは新規登録をしてください。");
+      window.location.href = "register.html";
+    } else {
+      const userInfoDiv = document.getElementById("user-info");
+      userInfoDiv.innerHTML = `
+        <p><strong>メールアドレス:</strong> ${userData.email}</p>
+        <p><strong>氏名:</strong> ${userData.name}</p>
+        <p><strong>住所:</strong> ${userData.address}</p>
+        <p><strong>電話番号:</strong> ${userData.phone}</p>
+        <p><strong>クレジットカード番号:</strong> **** **** **** ${userData.cardNumber.slice(-4)}</p>
+        <p><strong>有効期限:</strong> ${userData.expiry}</p>
+      `;
+    }
+
+    // 商品一覧に戻るボタン
+    document.getElementById("back-to-products").addEventListener("click", () => {
+      window.location.href = "index.html";
+    });
+
+    // ログアウトボタン
+    document.getElementById("logout").addEventListener("click", () => {
+      const userData = JSON.parse(localStorage.getItem("userData")) || {};
+      userData.loginStatus = 0;
+      localStorage.setItem("userData", JSON.stringify(userData));
+      alert("ログアウトしました。");
+      window.location.href = "index.html";
+    });
+
+    // アカウント削除ボタン
+    document.getElementById("delete").addEventListener("click", () => {
+      localStorage.removeItem("userData");
+      alert("アカウントを削除しました。");
+      window.location.href = "index.html";
+    });
+  </script>
+</body>
+
+</html>

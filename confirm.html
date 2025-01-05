@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ゲスト情報登録 - ABCDEC Site</title>
+  <title>購入内容確認 - ABCDEC Site</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -48,6 +48,13 @@
     h2 {
       margin-top: 0;
       color: #333;
+    }
+    .info-group {
+      margin-bottom: 15px;
+    }
+    .info-group p {
+      margin: 5px 0;
+      font-size: 16px;
     }
     .section-divider {
       border-top: 2px solid #ddd;
@@ -133,42 +140,21 @@
 
   <div class="container">
     <h2>配送先情報登録</h2>
-    <div class="form-group">
-      <label for="name">氏名</label>
-      <input type="text" id="name" placeholder="氏名を入力してください">
-      <p id="name-error" class="error"></p>
-    </div>
-    <div class="form-group">
-      <label for="address">住所</label>
-      <input type="text" id="address" placeholder="住所を入力してください">
-      <p id="address-error" class="error"></p>
-    </div>
-    <div class="form-group">
-      <label for="phone">電話番号</label>
-      <input type="tel" id="phone" placeholder="電話番号を入力してください" maxlength="11">
-      <p id="phone-error" class="error"></p>
+    <div class="info-group">
+      <p><strong>氏名:</strong> <span id="name"></span></p>
+      <p><strong>住所:</strong> <span id="address"></span></p>
+      <p><strong>電話番号:</strong> <span id="phone"></span></p>
     </div>
 
     <!-- 支払い情報登録の前に区切り線 -->
     <div class="section-divider"></div>
     
     <h2>支払い情報登録</h2>
-    <div class="form-group">
-      <label>
-        <input type="radio" name="payment" value="credit" checked>
-        クレジットカード
-      </label>
+    <div class="info-group">
+      <p><strong>クレジットカード番号:</strong> **** **** **** <span id="card-number"></span></p>
+      <p><strong>有効期限:</strong> <span id="expiry"></span></p>
     </div>
-    <div class="form-group">
-      <label for="card-number">クレジットカード番号</label>
-      <input type="text" id="card-number" placeholder="カード番号を入力してください" maxlength="16">
-      <p id="card-number-error" class="error"></p>
-    </div>
-    <div class="form-group">
-      <label for="expiry">カード有効期限</label>
-      <input type="text" id="expiry" placeholder="例: 12/25" maxlength="5">
-      <p id="expiry-error" class="error"></p>
-    </div>
+    
     <div class="form-group">
       <label for="security-code">セキュリティコード</label>
       <input type="text" id="security-code" placeholder="セキュリティコードを入力してください" maxlength="4">
@@ -181,7 +167,7 @@
     <h2>カート内容</h2>
     <div id="cart-list"></div>
     <div id="cart-total" class="total"></div>
-
+    
     <div class="form-actions">
       <button id="back-to-cart">カートに戻る</button>
       <button id="place-order">購入する</button>
@@ -219,36 +205,6 @@
         cartCountElement.textContent = totalCount;
       }
     }
-
-    // 電話番号の入力補助
-    document.getElementById("phone").addEventListener("input", (event) => {
-      const input = event.target;
-      input.value = input.value.replace(/[^0-9]/g, ""); // 数字以外を除去
-    });
-
-    // クレジットカード番号の入力補助
-    document.getElementById("card-number").addEventListener("input", (event) => {
-      const input = event.target;
-      input.value = input.value.replace(/[^0-9]/g, ""); // 数字以外を除去
-    });
-
-    // カード有効期限の入力補助
-    document.getElementById("expiry").addEventListener("input", (event) => {
-      const input = event.target;
-      let value = input.value.replace(/[^0-9/]/g, ""); // 数字とスラッシュ以外を除去
-
-      // 最初の2桁を入力したら自動で「/」を追加
-      if (value.length === 2 && !value.includes("/")) {
-        value += "/";
-      }
-
-      // フォーマットを維持
-      if (value.length > 5) {
-        value = value.slice(0, 5);
-      }
-
-      input.value = value;
-    });
 
     // セキュリティコードの入力補助
     document.getElementById("security-code").addEventListener("input", (event) => {
@@ -315,21 +271,24 @@
       }
     }
 
+    // ローカルストレージからデータを取得して表示
+    const userData = JSON.parse(localStorage.getItem("userData"));
+    if (userData) {
+      document.getElementById("name").textContent = userData.name;
+      document.getElementById("address").textContent = userData.address;
+      document.getElementById("phone").textContent = userData.phone;
+      document.getElementById("card-number").textContent = userData.cardNumber.slice(-4);
+      document.getElementById("expiry").textContent = userData.expiry;
+    } else {
+      alert("ユーザーデータが見つかりません。");
+      window.location.href = "register.html";
+    }
+
     // 購入ボタン
     document.getElementById("place-order").addEventListener("click", () => {
-      const isNameValid = validateRequiredField("name", "name-error", "氏名は必須です。");
-      const isAddressValid = validateRequiredField("address", "address-error", "住所は必須です。");
-      const isPhoneValid = validateRequiredField("phone", "phone-error", "電話番号は必須です。");
-      const isCardNumberValid = validateRequiredField("card-number", "card-number-error", "カード番号は必須です。");
-      const isExpiryValid = validateRequiredField("expiry", "expiry-error", "有効期限は必須です。");
       const isSecurityCodeValid = validateRequiredField("security-code", "security-code-error", "セキュリティコードは必須です。");
 
-      if (!isCardNumberValid || !/^\d{14,16}$/.test(document.getElementById("card-number").value)) {
-        document.getElementById("card-number-error").textContent = "クレジットカード番号は14〜16桁の数字のみです。";
-        return;
-      }
-
-      if (isNameValid && isAddressValid && isPhoneValid && isCardNumberValid && isExpiryValid && isSecurityCodeValid) {
+      if (isSecurityCodeValid) {
         alert("ありがとうございました。");
         localStorage.removeItem("cart");
         window.location.href = "index.html";

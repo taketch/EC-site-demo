@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ゲスト情報登録 - ABCDEC Site</title>
+  <title>新規アカウント作成 - ABCDEC Site</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -12,7 +12,7 @@
       background-color: #f9f9f9;
     }
     .container {
-      max-width: 960px;
+      max-width: 400px;
       margin: 20px auto;
       padding: 20px 40px;
       background-color: #fff;
@@ -61,7 +61,7 @@
       margin-bottom: 5px;
       font-weight: bold;
     }
-    input[type="text"], input[type="tel"] {
+    input[type="text"], input[type="tel"], input[type="email"], input[type="password"] {
       width: 100%;
       padding: 10px;
       font-size: 16px;
@@ -110,6 +110,7 @@
       margin-top: 20px;
     }
     .form-actions button {
+      margin-bottom: 10px;
       padding: 10px 20px;
       background-color: #007BFF;
       color: #fff;
@@ -125,6 +126,13 @@
       color: red;
       font-size: 14px;
     }
+    .text-link {
+      display: block;
+      margin-top: 10px;
+      font-size: 14px;
+      color: #007BFF;
+      text-decoration: none;
+    }
   </style>
 </head>
 <body>
@@ -132,7 +140,19 @@
   <div id="header-placeholder"></div>
 
   <div class="container">
-    <h2>配送先情報登録</h2>
+    <h2>ログイン情報登録</h2>
+    <div class="form-group">
+      <label for="email">メールアドレス</label>
+      <input type="email" id="email" placeholder="メールアドレスを入力してください">
+      <p id="email-error" class="error"></p>
+    </div>
+    <div class="form-group">
+      <label for="password">パスワード</label>
+      <input type="text" id="password" placeholder="パスワードを入力してください">
+      <p id="password-error" class="error"></p>
+    </div>
+
+    <h2>配送先情報</h2>
     <div class="form-group">
       <label for="name">氏名</label>
       <input type="text" id="name" placeholder="氏名を入力してください">
@@ -149,16 +169,7 @@
       <p id="phone-error" class="error"></p>
     </div>
 
-    <!-- 支払い情報登録の前に区切り線 -->
-    <div class="section-divider"></div>
-    
     <h2>支払い情報登録</h2>
-    <div class="form-group">
-      <label>
-        <input type="radio" name="payment" value="credit" checked>
-        クレジットカード
-      </label>
-    </div>
     <div class="form-group">
       <label for="card-number">クレジットカード番号</label>
       <input type="text" id="card-number" placeholder="カード番号を入力してください" maxlength="16">
@@ -169,54 +180,32 @@
       <input type="text" id="expiry" placeholder="例: 12/25" maxlength="5">
       <p id="expiry-error" class="error"></p>
     </div>
-    <div class="form-group">
-      <label for="security-code">セキュリティコード</label>
-      <input type="text" id="security-code" placeholder="セキュリティコードを入力してください" maxlength="4">
-      <p id="security-code-error" class="error"></p>
-    </div>
-
-    <!-- カート内容の前に区切り線 -->
-    <div class="section-divider"></div>
-
-    <h2>カート内容</h2>
-    <div id="cart-list"></div>
-    <div id="cart-total" class="total"></div>
 
     <div class="form-actions">
-      <button id="back-to-cart">カートに戻る</button>
-      <button id="place-order">購入する</button>
+      <button id="register">登録</button>
     </div>
+    <a href="index.html" class="text-link">商品一覧に戻る</a>
   </div>
+
   <script>
     // ヘッダーの読み込み
     fetch("header.html")
       .then(response => response.text())
       .then(data => {
         document.getElementById("header-placeholder").innerHTML = data;
-        
-        // ログイン状態に応じてリンクを変更
-        const userDataString = localStorage.getItem("userData");
-        if (userDataString) {
-          const userData = JSON.parse(userDataString); // JSONオブジェクトに変換
-          const loginLink = document.querySelector('a[href="login.html"]'); // ログインリンクを取得
-          if (userData.loginStatus === 1 && loginLink) {
-            loginLink.textContent = "マイページ"; // テキストを変更
-            loginLink.setAttribute("href", "mypage.html"); // リンク先を変更
-          }
-        }
-
-        // ヘッダー読み込み後にカート総数を更新
-        updateCartCount();
+        updateCartCount(); // ヘッダー読み込み後にカート総数を更新
       })
       .catch(error => console.error("ヘッダーの読み込みに失敗しました:", error));
-
-    // ローカルストレージのカート総数を取得して表示
-    function updateCartCount() {
-      const cart = JSON.parse(localStorage.getItem("cart")) || [];
-      const totalCount = cart.length; // 総商品の数
-      const cartCountElement = document.getElementById("cart-count");
-      if (cartCountElement) {
-        cartCountElement.textContent = totalCount;
+    
+    // 入力バリデーション関数
+    function validateRequiredField(id, errorId, message) {
+      const value = document.getElementById(id).value.trim();
+      if (!value) {
+        document.getElementById(errorId).textContent = message;
+        return false;
+      } else {
+        document.getElementById(errorId).textContent = "";
+        return true;
       }
     }
 
@@ -250,99 +239,41 @@
       input.value = value;
     });
 
-    // セキュリティコードの入力補助
-    document.getElementById("security-code").addEventListener("input", (event) => {
-      const input = event.target;
-      input.value = input.value.replace(/[^0-9]/g, ""); // 数字以外を除去
-    });
-
-    // カートの商品を描画
-    function renderCart() {
-      const cartList = document.getElementById("cart-list");
-      const cartTotal = document.getElementById("cart-total");
-      const cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-      cartList.innerHTML = ""; // 初期化
-      cartTotal.innerHTML = ""; // 初期化
-
-      if (cart.length === 0) {
-        cartList.innerHTML = '<p class="empty-cart">カートは空です。</p>';
-        return;
-      }
-
-      let totalAmount = 0;
-
-      const groupedCart = cart.reduce((acc, product) => {
-        const existingProduct = acc.find(item => item.name === product.name);
-        if (existingProduct) {
-          existingProduct.quantity += 1;
-        } else {
-          acc.push({ ...product, quantity: 1 });
-        }
-        return acc;
-      }, []);
-
-      groupedCart.forEach(product => {
-        const productDiv = document.createElement("div");
-        productDiv.className = "product";
-        productDiv.innerHTML = `
-          <img src="${product.image}" alt="${product.name}">
-          <div class="product-details">
-            <h2>${product.name}</h2>
-            <p>${product.description}</p>
-            <p>価格: ¥${product.price.toLocaleString()}</p>
-            <p>数量: ${product.quantity}</p>
-          </div>
-        `;
-        cartList.appendChild(productDiv);
-
-        totalAmount += product.price * product.quantity;
-      });
-
-      // 合計金額を表示
-      cartTotal.textContent = `合計金額: ¥${totalAmount.toLocaleString()}`;
-    }
-
-    // 必須入力バリデーション
-    function validateRequiredField(id, errorId, message) {
-      const value = document.getElementById(id).value.trim();
-      if (!value) {
-        document.getElementById(errorId).textContent = message;
-        return false;
-      } else {
-        document.getElementById(errorId).textContent = "";
-        return true;
-      }
-    }
-
-    // 購入ボタン
-    document.getElementById("place-order").addEventListener("click", () => {
+    // 登録ボタン処理
+    document.getElementById("register").addEventListener("click", () => {
+      const isEmailValid = validateRequiredField("email", "email-error", "メールアドレスは必須です。");
+      const isPasswordValid = validateRequiredField("password", "password-error", "パスワードは必須です。");
       const isNameValid = validateRequiredField("name", "name-error", "氏名は必須です。");
       const isAddressValid = validateRequiredField("address", "address-error", "住所は必須です。");
       const isPhoneValid = validateRequiredField("phone", "phone-error", "電話番号は必須です。");
       const isCardNumberValid = validateRequiredField("card-number", "card-number-error", "カード番号は必須です。");
       const isExpiryValid = validateRequiredField("expiry", "expiry-error", "有効期限は必須です。");
-      const isSecurityCodeValid = validateRequiredField("security-code", "security-code-error", "セキュリティコードは必須です。");
 
+      // クレジットカード番号の形式チェック
       if (!isCardNumberValid || !/^\d{14,16}$/.test(document.getElementById("card-number").value)) {
         document.getElementById("card-number-error").textContent = "クレジットカード番号は14〜16桁の数字のみです。";
         return;
       }
 
-      if (isNameValid && isAddressValid && isPhoneValid && isCardNumberValid && isExpiryValid && isSecurityCodeValid) {
-        alert("ありがとうございました。");
-        localStorage.removeItem("cart");
-        window.location.href = "index.html";
+      // 全ての入力が有効な場合
+      if (isEmailValid && isPasswordValid && isNameValid && isAddressValid && isPhoneValid && isCardNumberValid && isExpiryValid) {
+        // ローカルストレージに保存
+        const userData = {
+          email: document.getElementById("email").value.trim(),
+          password: document.getElementById("password").value.trim(),
+          name: document.getElementById("name").value.trim(),
+          address: document.getElementById("address").value.trim(),
+          phone: document.getElementById("phone").value.trim(),
+          cardNumber: document.getElementById("card-number").value.trim(),
+          expiry: document.getElementById("expiry").value.trim(),
+          loginStatus: 1,
+        };
+        localStorage.setItem("userData", JSON.stringify(userData));
+
+        // mypage.html に遷移
+        window.location.href = "mypage.html";
       }
     });
-
-    // カートに戻るボタン
-    document.getElementById("back-to-cart").addEventListener("click", () => {
-      window.location.href = "cart.html";
-    });
-
-    // 初期化
-    renderCart();
   </script>
 </body>
 </html>

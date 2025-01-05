@@ -154,7 +154,20 @@
       .then(response => response.text())
       .then(data => {
         document.getElementById("header-placeholder").innerHTML = data;
-        updateCartCount(); // ヘッダー読み込み後にカート総数を更新
+
+        // ログイン状態に応じてリンクを変更
+        const userDataString = localStorage.getItem("userData");
+        if (userDataString) {
+          const userData = JSON.parse(userDataString); // JSONオブジェクトに変換
+          const loginLink = document.querySelector('a[href="login.html"]'); // ログインリンクを取得
+          if (userData.loginStatus === 1 && loginLink) {
+            loginLink.textContent = "マイページ"; // テキストを変更
+            loginLink.setAttribute("href", "mypage.html"); // リンク先を変更
+          }
+        }
+
+        // ヘッダー読み込み後にカート総数を更新
+        updateCartCount();
       })
       .catch(error => console.error("ヘッダーの読み込みに失敗しました:", error));
 
