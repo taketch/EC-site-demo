@@ -239,6 +239,29 @@
     .carousel-button.next {
       right: 10px;
     }
+    
+    .search-container {
+      margin: 20px 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    .search-input {
+      width: 80%; /* 入力欄を広くする */
+      max-width: 600px; /* 入力欄の最大幅を設定 */
+      padding: 15px; /* 余白を広げる */
+      font-size: 18px; /* フォントサイズを大きくする */
+      border: 2px solid #ddd; /* 境界線を少し太くする */
+      border-radius: 8px; /* 角を丸める */
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 軽い影を追加 */
+      transition: border-color 0.3s, box-shadow 0.3s; /* ホバー時のスムーズな変化 */
+    }
+
+    .search-input:focus {
+      border-color: #007BFF; /* フォーカス時の境界線色 */
+      box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2); /* フォーカス時の影 */
+      outline: none; /* デフォルトのフォーカス枠を非表示 */
+    }
   </style>
 </head>
 
@@ -433,6 +456,41 @@
       }
     }
 
+    // 検索機能のセットアップ
+    function setupSearchFeature() {
+      const searchInput = document.getElementById("search-input");
+      const searchResultsContainer = document.getElementById("search-results");
+
+      searchInput.addEventListener("input", (e) => {
+        const query = e.target.value.toLowerCase();
+        const filteredProducts = products.filter(product =>
+          product.name.toLowerCase().includes(query) || // 商品名で部分一致
+          product.description.toLowerCase().includes(query) || // 説明で部分一致
+          product.price.toString().includes(query) // 価格で部分一致
+        );
+
+        // 検索結果を表示
+        searchResultsContainer.innerHTML = "";
+        filteredProducts.forEach(product => {
+          const productDiv = document.createElement("div");
+          productDiv.className = "product";
+          productDiv.innerHTML = `
+            <img src="${product.image}" alt="${product.name}">
+            <div class="product-details">
+              <h2>${product.name}</h2>
+              <p>${product.description}</p>
+              <p>価格: ¥${product.price.toLocaleString()}</p>
+            </div>
+            <button class="add-to-cart">カートに追加</button>
+          `;
+          productDiv.querySelector(".add-to-cart").addEventListener("click", () => {
+            addToCart(product);
+            window.location.href = "cart.html"; // カートページに遷移
+          });
+          searchResultsContainer.appendChild(productDiv);
+        });
+      });
+    }
 
     // タブ切り替え
     document.querySelector('.tabs').addEventListener('click', (e) => {
@@ -442,9 +500,24 @@
       document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
       e.target.classList.add('active');
 
-      currentPage = 1;
-      renderProducts(currentPage, category);
-      renderPagination(category);
+      const productList = document.getElementById("product-list");
+      const pagination = document.getElementById("pagination");
+
+      if (category === "search") {
+        // 検索タブの場合、検索UIを表示
+        productList.innerHTML = `
+          <div class="search-container">
+            <input type="text" id="search-input" class="search-input" placeholder="商品を検索">
+          </div>
+          <div id="search-results"></div>
+        `;
+        pagination.style.display = "none"; // ページネーションを非表示
+        setupSearchFeature(); // 検索機能の初期化
+      } else {
+        currentPage = 1;
+        renderProducts(currentPage, category);
+        pagination.style.display = "block"; // ページネーションを表示
+      }
     });
 
     // 商品データの取得
