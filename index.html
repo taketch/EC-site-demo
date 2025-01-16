@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,6 +12,7 @@
       padding: 0;
       background-color: #f9f9f9;
     }
+
     header {
       background-color: #333;
       color: #fff;
@@ -19,20 +21,24 @@
       justify-content: space-between;
       align-items: center;
     }
+
     header h1 {
       margin: 0;
     }
+
     .cart {
       display: flex;
       align-items: center;
       font-size: 16px;
     }
+
     .cart-icon {
       width: 24px;
       height: 24px;
       margin-right: 8px;
       fill: #ffffff;
     }
+
     .container {
       max-width: 960px;
       margin: 20px auto;
@@ -41,6 +47,34 @@
       border-radius: 8px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
+
+    .tabs {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #ddd;
+    }
+
+    .tab {
+      padding: 10px 20px;
+      border: none;
+      background-color: transparent;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      color: #555;
+      transition: color 0.3s, border-bottom 0.3s;
+    }
+
+    .tab.active {
+      color: #007BFF;
+      border-bottom: 3px solid #007BFF;
+    }
+
+    .tab:hover {
+      color: #0056b3;
+    }
+
     .product {
       border-bottom: 1px solid #ddd;
       padding: 20px 0;
@@ -48,23 +82,29 @@
       align-items: center;
       justify-content: space-between;
     }
+
     .product:last-child {
       border-bottom: none;
     }
+
     .product img {
       max-width: 100px;
       margin-right: 20px;
     }
+
     .product-details {
       flex-grow: 1;
     }
+
     .product h2 {
       margin: 0 0 10px;
       font-size: 18px;
     }
+
     .product p {
       margin: 5px 0;
     }
+
     .product button {
       padding: 10px 15px;
       background-color: #007BFF;
@@ -73,9 +113,11 @@
       border-radius: 5px;
       cursor: pointer;
     }
+
     .product button:hover {
       background-color: #0056b3;
     }
+
     .loading {
       position: fixed;
       top: 50%;
@@ -84,6 +126,7 @@
       text-align: center;
       z-index: 1000;
     }
+
     .spinner {
       width: 40px;
       height: 40px;
@@ -92,27 +135,33 @@
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
+
     @keyframes spin {
       0% {
         transform: rotate(0deg);
       }
+
       100% {
         transform: rotate(360deg);
       }
     }
+
     .loading p {
       margin-top: 10px;
       font-size: 16px;
       color: #333;
       font-weight: bold;
     }
+
     .hidden {
       display: none;
     }
+
     .pagination {
       text-align: center;
       margin-top: 20px;
     }
+
     .pagination button {
       margin: 0 5px;
       padding: 10px 15px;
@@ -122,17 +171,100 @@
       border-radius: 5px;
       font-size: 14px;
     }
+
     .pagination button.active {
       background-color: #007BFF;
       color: #fff;
       border: none;
     }
+
     .pagination button:hover {
       background-color: #0056b3;
       color: #fff;
     }
+
+    .carousel {
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      max-width: 300px;
+      margin: 20px auto;
+      padding-bottom: 10px;
+      /* 商品名分の余白を確保 */
+    }
+
+    .carousel-track {
+      display: flex;
+      transition: transform 0.5s ease-in-out;
+    }
+
+    .slide {
+      min-width: 100%;
+      box-sizing: border-box;
+      text-align: center;
+      padding-bottom: 10px;
+    }
+
+    .carousel img {
+      max-width: 100%;
+      height: auto;
+      margin: 0 auto;
+      cursor: pointer;
+    }
+
+    .carousel h2 {
+      font-size: 18px;
+      margin: 3px 0 0;
+      color: #333;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .carousel-button {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0, 0, 0, 0.5);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      padding: 5px 10px;
+      font-size: 16px;
+    }
+
+    .carousel-button.prev {
+      left: 10px;
+    }
+
+    .carousel-button.next {
+      right: 10px;
+    }
+    
+    .search-container {
+      margin: 20px 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    .search-input {
+      width: 80%; /* 入力欄を広くする */
+      max-width: 600px; /* 入力欄の最大幅を設定 */
+      padding: 15px; /* 余白を広げる */
+      font-size: 18px; /* フォントサイズを大きくする */
+      border: 2px solid #ddd; /* 境界線を少し太くする */
+      border-radius: 8px; /* 角を丸める */
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 軽い影を追加 */
+      transition: border-color 0.3s, box-shadow 0.3s; /* ホバー時のスムーズな変化 */
+    }
+
+    .search-input:focus {
+      border-color: #007BFF; /* フォーカス時の境界線色 */
+      box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2); /* フォーカス時の影 */
+      outline: none; /* デフォルトのフォーカス枠を非表示 */
+    }
   </style>
 </head>
+
 <body>
   <!-- ヘッダーをインクルード -->
   <div id="header-placeholder"></div>
@@ -144,6 +276,22 @@
   </div>
 
   <div class="container hidden">
+    <div class="carousel">
+      <div class="carousel-track">
+        <!-- JavaScriptで追加 -->
+      </div>
+      <button class="carousel-button prev">◀</button>
+      <button class="carousel-button next">▶</button>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" data-category="all">すべて</div>
+      <div class="tab" data-category="トップス">トップス</div>
+      <div class="tab" data-category="バッグ">バッグ</div>
+      <div class="tab" data-category="アクセサリー・小物">アクセサリー・小物</div>
+      <div class="tab" data-category="search">検索</div>
+    </div>
+
     <div id="product-list"></div>
     <div id="pagination" class="pagination"></div>
   </div>
@@ -196,10 +344,16 @@
     }
 
     // 商品リストの描画
-    function renderProducts(page) {
+    function renderProducts(page, category = "all") {
       const startIndex = (page - 1) * itemsPerPage;
       const endIndex = startIndex + itemsPerPage;
-      const pageProducts = products.slice(startIndex, endIndex);
+      let filteredProducts = products;
+
+      if (category !== "all") {
+        filteredProducts = products.filter(product => product.category === category);
+      }
+
+      const pageProducts = filteredProducts.slice(startIndex, endIndex);
 
       const productList = document.getElementById("product-list");
       productList.innerHTML = ""; // 初期化
@@ -225,11 +379,16 @@
     }
 
     // ページネーションを描画する関数
-    function renderPagination() {
+    function renderPagination(category = "all") {
       const pagination = document.getElementById("pagination");
       pagination.innerHTML = "";
 
-      const totalPages = Math.ceil(products.length / itemsPerPage);
+      let filteredProducts = products;
+      if (category !== "all") {
+        filteredProducts = products.filter(product => product.category === category);
+      }
+
+      const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
       if (totalPages <= 1) return;
 
       for (let i = 1; i <= totalPages; i++) {
@@ -239,21 +398,142 @@
         button.addEventListener("click", () => {
           if (currentPage !== i) {
             currentPage = i;
-            renderProducts(currentPage);
-            renderPagination();
+            renderProducts(currentPage, category);
+            renderPagination(category);
           }
         });
         pagination.appendChild(button);
       }
     }
 
+    // カルーセルの描画
+    function renderCarousel(products) {
+      const track = document.querySelector('.carousel-track');
+      track.innerHTML = ""; // 初期化
+
+      products.forEach(product => {
+        const slide = document.createElement('div');
+        slide.className = 'slide';
+        slide.innerHTML = `
+          <img src="${product.image}" alt="${product.name}" onclick="handleCarouselClick(${product.id})">
+          <h2 onclick="handleCarouselClick(${product.id})">${product.name}</h2>
+        `;
+        track.appendChild(slide);
+      });
+
+      initializeCarousel(track);
+    }
+
+    // カルーセルの初期化
+    function initializeCarousel(track) {
+      const slides = Array.from(track.children);
+      let currentIndex = 0;
+
+      const updateSlidePosition = () => {
+        const slideWidth = slides[0].getBoundingClientRect().width;
+        track.style.transform = `translateX(-${currentIndex * slideWidth}px)`;
+      };
+
+      document.querySelector('.carousel-button.next').addEventListener('click', () => {
+        currentIndex = (currentIndex + 1) % slides.length;
+        updateSlidePosition();
+      });
+
+      document.querySelector('.carousel-button.prev').addEventListener('click', () => {
+        currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+        updateSlidePosition();
+      });
+
+      updateSlidePosition();
+    }
+
+    // カルーセルのクリックイベント
+    function handleCarouselClick(productId) {
+      const selectedProduct = products.find(product => product.id === productId);
+      if (selectedProduct) {
+        addToCart(selectedProduct); // カートに追加
+        window.location.href = "cart.html"; // カートページに遷移
+      }
+    }
+
+    // 検索機能のセットアップ
+    function setupSearchFeature() {
+      const searchInput = document.getElementById("search-input");
+      const searchResultsContainer = document.getElementById("search-results");
+
+      searchInput.addEventListener("input", (e) => {
+        const query = e.target.value.toLowerCase();
+        const filteredProducts = products.filter(product =>
+          product.name.toLowerCase().includes(query) || // 商品名で部分一致
+          product.description.toLowerCase().includes(query) || // 説明で部分一致
+          product.price.toString().includes(query) // 価格で部分一致
+        );
+
+        // 検索結果を表示
+        searchResultsContainer.innerHTML = "";
+        filteredProducts.forEach(product => {
+          const productDiv = document.createElement("div");
+          productDiv.className = "product";
+          productDiv.innerHTML = `
+            <img src="${product.image}" alt="${product.name}">
+            <div class="product-details">
+              <h2>${product.name}</h2>
+              <p>${product.description}</p>
+              <p>価格: ¥${product.price.toLocaleString()}</p>
+            </div>
+            <button class="add-to-cart">カートに追加</button>
+          `;
+          productDiv.querySelector(".add-to-cart").addEventListener("click", () => {
+            addToCart(product);
+            window.location.href = "cart.html"; // カートページに遷移
+          });
+          searchResultsContainer.appendChild(productDiv);
+        });
+      });
+    }
+
+    // タブ切り替え
+    document.querySelector('.tabs').addEventListener('click', (e) => {
+      if (!e.target.classList.contains('tab')) return;
+
+      const category = e.target.getAttribute('data-category');
+      document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+      e.target.classList.add('active');
+
+      const productList = document.getElementById("product-list");
+      const pagination = document.getElementById("pagination");
+
+      if (category === "search") {
+        // 検索タブの場合、検索UIを表示
+        productList.innerHTML = `
+          <div class="search-container">
+            <input type="text" id="search-input" class="search-input" placeholder="商品を検索">
+          </div>
+          <div id="search-results"></div>
+        `;
+        pagination.style.display = "none"; // ページネーションを非表示
+        setupSearchFeature(); // 検索機能の初期化
+      } else {
+        currentPage = 1;
+        renderProducts(currentPage, category);
+        pagination.style.display = "block"; // ページネーションを表示
+      }
+    });
+
     // 商品データの取得
     fetch(GAS_URL)
       .then(response => response.json())
       .then(data => {
         products = data; // APIから取得した商品データを保存
-        renderProducts(currentPage); // 商品一覧を描画
-        renderPagination(); // ページネーションを描画
+
+        // 商品一覧とページネーションを描画
+        renderProducts(currentPage);
+        renderPagination();
+
+        // カルーセルを描画
+        renderCarousel(products);
+
+        // ローディングインジケータを非表示にし、コンテンツを表示
         document.getElementById("loading-indicator").classList.add("hidden");
         document.querySelector(".container").classList.remove("hidden");
       })
@@ -263,4 +543,5 @@
       });
   </script>
 </body>
+
 </html>
