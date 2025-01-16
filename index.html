@@ -131,6 +131,52 @@
       background-color: #0056b3;
       color: #fff;
     }
+    .carousel {
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      max-width: 300px;
+      margin: 20px auto;
+      padding-bottom: 10px; /* 商品名分の余白を確保 */
+    }
+    .carousel-track {
+      display: flex;
+      transition: transform 0.5s ease-in-out;
+    }
+    .slide {
+      min-width: 100%;
+      box-sizing: border-box;
+      text-align: center;
+      padding-bottom: 10px;
+    }
+    .carousel img {
+      max-width: 100%;
+      height: auto;
+      margin: 0 auto;
+    }
+    .carousel h2 {
+      font-size: 18px;
+      margin: 3px 0 0;
+      color: #333;
+      text-align: center;
+    }
+    .carousel-button {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0, 0, 0, 0.5);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      padding: 5px 10px;
+      font-size: 16px;
+    }
+    .carousel-button.prev {
+      left: 10px;
+    }
+    .carousel-button.next {
+      right: 10px;
+    }
   </style>
 </head>
 <body>
@@ -144,6 +190,13 @@
   </div>
 
   <div class="container hidden">
+    <div class="carousel">
+      <div class="carousel-track">
+        <!-- JavaScriptで追加 -->
+      </div>
+      <button class="carousel-button prev">◀</button>
+      <button class="carousel-button next">▶</button>
+    </div>
     <div id="product-list"></div>
     <div id="pagination" class="pagination"></div>
   </div>
@@ -247,13 +300,62 @@
       }
     }
 
+    // カルーセルの描画
+    function renderCarousel(products) {
+      const track = document.querySelector('.carousel-track');
+      track.innerHTML = ""; // 初期化
+
+      products.forEach(product => {
+        const slide = document.createElement('div');
+        slide.className = 'slide';
+        slide.innerHTML = `
+          <img src="${product.image}" alt="${product.name}" style="max-width: 100%; height: auto;">
+          <h2>${product.name}</h2>
+        `;
+        track.appendChild(slide);
+      });
+
+      initializeCarousel(track);
+    }
+
+    // カルーセルの初期化
+    function initializeCarousel(track) {
+      const slides = Array.from(track.children);
+      let currentIndex = 0;
+
+      const updateSlidePosition = () => {
+        const slideWidth = slides[0].getBoundingClientRect().width;
+        track.style.transform = `translateX(-${currentIndex * slideWidth}px)`;
+      };
+
+      document.querySelector('.carousel-button.next').addEventListener('click', () => {
+        currentIndex = (currentIndex + 1) % slides.length;
+        updateSlidePosition();
+      });
+
+      document.querySelector('.carousel-button.prev').addEventListener('click', () => {
+        currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+        updateSlidePosition();
+      });
+
+      // 初期位置の更新
+      updateSlidePosition();
+    }
+
     // 商品データの取得
     fetch(GAS_URL)
       .then(response => response.json())
       .then(data => {
         products = data; // APIから取得した商品データを保存
-        renderProducts(currentPage); // 商品一覧を描画
-        renderPagination(); // ページネーションを描画
+
+        // 商品一覧とページネーションを描画
+        renderProducts(currentPage);
+        renderPagination();
+
+        // カルーセルを描画
+        renderCarousel(products);
+
+        // ローディングインジケータを非表示にし、コンテンツを表示
         document.getElementById("loading-indicator").classList.add("hidden");
         document.querySelector(".container").classList.remove("hidden");
       })
